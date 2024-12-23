@@ -14,4 +14,4 @@ const getProductModel = async (id) => {
 
 export {
     getProductModel
-}
+  }
