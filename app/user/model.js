@@ -19,4 +19,15 @@ const createUserModel = async (userData) => {
     return result.rows[0];
   };
   
-  export { createUserModel };
+  const loginUserModel = async (email) => {
+    const query = 'SELECT * FROM public.user WHERE email = $1;';
+    const values = [email];
+    const result = await pool.query(query, values);
+  
+    if (result.rows.length === 0) {
+      return null; // No user found
+    }
+    
+    return result.rows[0].email;
+  }; 
+  export { createUserModel,loginUserModel };

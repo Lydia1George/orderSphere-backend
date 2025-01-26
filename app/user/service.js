@@ -1,6 +1,7 @@
 //buisness logic
 import { createUserModel } from "./model.js";
 import bcrypt from 'bcrypt'
+import { loginUserModel } from "./model.js";
 
 
 const createUser = async(userData) =>{
@@ -15,6 +16,11 @@ const createUser = async(userData) =>{
   const userCreate = await createUserModel(userWithHashedPassword);
   return userCreate;
 }
+const loginUser = async(email) =>{
+  const userLogin = await loginUserModel(email)
+  return userLogin
+}
+
 export {
-    createUser
+    createUser,loginUser
 }

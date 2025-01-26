@@ -1,8 +1,11 @@
-import { createUser } from './service.js';
+import { createUser, loginUser } from './service.js';
 import { userSchema } from './validation.js';
 import express from "express"
+import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
 
 const createUserRouter = express.Router()
+const loginUserRouter = express.Router()
 createUserRouter.post('/',async(req,res)=>{
     try {
       // Validate request body
@@ -23,7 +26,15 @@ createUserRouter.post('/',async(req,res)=>{
       }
     }
   });
-  
+  loginUserRouter.post('/',async(req,res)=>{
+    const { email } = req.body; 
+    console.log(email)
+    const userLoggedInEmail = await loginUser(email);
+    //console.log(userLoggedInEmail)
+    const accessToken = jwt.sign(userLoggedInEmail,process.env.ACCESS_TOKEN_SECRET)
+    res.json({accessToken: accessToken})
+
+  });
 export{
-    createUserRouter
+    createUserRouter,loginUserRouter
 }
