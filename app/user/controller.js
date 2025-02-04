@@ -35,6 +35,12 @@ createUserRouter.post('/',async(req,res)=>{
     res.json({accessToken: accessToken})
 
   });
+
+ function authenticateToken(req, res, nex){
+  const authHeader = req.authHeader['authorization']
+  const token = authHeader.split(' ')[1]
+
+ }
 export{
-    createUserRouter,loginUserRouter
+    createUserRouter,loginUserRouter, authenticateToken
 }
