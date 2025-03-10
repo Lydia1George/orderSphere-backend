@@ -1,10 +1,10 @@
 import { getUserOrders } from './service.js';
 import { userIdSchema } from './validation.js';
-import {authenticateToken} from "../../app/user/controller.js";
+
 import express from "express"
 
 const userOrdersSearchRouter = express.Router()
-userOrdersSearchRouter.get('/:userId',authenticateToken,async(req,res)=>{
+userOrdersSearchRouter.get('/:userId',async(req,res)=>{
     try {
         // Validate userId
         const { userId } = userIdSchema.parse(req.params);

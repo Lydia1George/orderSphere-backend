@@ -4,43 +4,47 @@ import express from "express"
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 
-const createUserRouter = express.Router()
-const loginUserRouter = express.Router()
-createUserRouter.post('/',async(req,res)=>{
-    try {
-      // Validate request body
-      const validatedData = userSchema.parse(req.body);
-  
-      // Register the user
-      const newUser = await createUser(validatedData);
-  
-      // Respond with created user (excluding password for security)
-      const { password, ...userWithoutPassword } = newUser;
-      res.status(201).json({ message: 'User created successfully', user: userWithoutPassword });
-    } catch (error) {
-        if (error.name === 'ZodError')  {
-        res.status(400).json({ errors: error.errors });
-      } else {
-        console.error('Error creating user:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-      }
+const userRouter = express.Router()
+
+userRouter.post('/register', async (req, res) => {
+  try {
+    // Validate request body
+    const validatedData = userSchema.parse(req.body);
+
+    // Register the user
+    const newUser = await createUser(validatedData);
+
+    // Respond with created user (excluding password for security)
+    const { password, ...userWithoutPassword } = newUser;
+    res.status(201).json({ message: 'User created successfully', user: userWithoutPassword });
+  } catch (error) {
+    if (error.name === 'ZodError') {
+      res.status(400).json({ errors: error.errors });
+    } else {
+      console.error('Error creating user:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
-  });
-  loginUserRouter.post('/',async(req,res)=>{
-    const { email } = req.body; 
-    console.log(email)
-    const userLoggedInEmail = await loginUser(email);
-    //console.log(userLoggedInEmail)
-    const accessToken = jwt.sign(userLoggedInEmail,process.env.ACCESS_TOKEN_SECRET)
-    res.json({accessToken: accessToken})
+  }
+});
+userRouter.post('/login', async (req, res) => {
+  const { email, password } = req.body;
 
-  });
+  console.log(email)
+  const userLoginData = await loginUser(email, password);
+  res.json(userLoginData);
+ 
+});
 
- function authenticateToken(req, res, nex){
-  const authHeader = req.authHeader['authorization']
-  const token = authHeader.split(' ')[1]
-
- }
-export{
-    createUserRouter,loginUserRouter, authenticateToken
+// function authenticateToken(req, res, next) {
+//   const authHeader = req.headers['authorization']
+//   const token = authHeader && authHeader.split(' ')[1]
+//   if (token == null) return res.sendStatus(401)
+//   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, userLoggedInEmail) => {
+//     if (err) return res.sendStatus(403)
+//     req.userLoggedInEmail = userLoggedInEmail
+//     next()
+//   })
+// }
+export {
+  userRouter
 }
