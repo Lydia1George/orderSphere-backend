@@ -1,5 +1,5 @@
 //buisness logic
-import { createUserModel } from "./model.js";
+import { createUserModel, resetRefreshToken } from "./model.js";
 import bcrypt from 'bcrypt'
 import { getUserModel,updateRefreshToken } from "./model.js";
 import jwt from 'jsonwebtoken'; 
@@ -15,7 +15,19 @@ const createUser = async(userData) =>{
 
   // Save user to the database
   const userCreate = await createUserModel(userWithHashedPassword);
-  return userCreate;
+  const tokenPayload={
+    id:userCreate.id,
+    email:userCreate.email,
+    firstName:userCreate.first_name,
+    lastName:userCreate.last_name
+  }
+  const accessToken = jwt.sign(tokenPayload,process.env.ACCESS_TOKEN_SECRET,{algorithm:"HS256",expiresIn:"1H"})
+  
+  const refreshToken = jwt.sign(tokenPayload,process.env.REFRESH_TOKEN_SECRET,{algorithm:"HS256",expiresIn:"1y"})
+  await updateRefreshToken(userCreate.id,refreshToken)
+ 
+  return {accessToken,refreshToken,...tokenPayload}
+ 
 }
 const loginUser = async(email,password) =>{
   console.log("Here 0")
@@ -23,13 +35,12 @@ const loginUser = async(email,password) =>{
   if(!user){
     return "Invalid login"
   }
-  console.log("Here 1",user)
   const userHashedPassword = user.password
   const isCorrectPassword = bcrypt.compareSync(password, userHashedPassword);
   if(!isCorrectPassword){
      return "Invalid login"
   }
-  console.log("Here 2",isCorrectPassword)
+  
   const tokenPayload={
     id:user.id,
     email:user.email,
@@ -39,13 +50,14 @@ const loginUser = async(email,password) =>{
   const accessToken = jwt.sign(tokenPayload,process.env.ACCESS_TOKEN_SECRET,{algorithm:"HS256",expiresIn:"1H"})
   
   const refreshToken = jwt.sign(tokenPayload,process.env.REFRESH_TOKEN_SECRET,{algorithm:"HS256",expiresIn:"1y"})
-  console.log("Here 3",refreshToken)
   await updateRefreshToken(user.id,refreshToken)
-  console.log("Here 4")
  
   return {accessToken,refreshToken}
 }
-
+const logoutUser = async(userId) =>{
+  await resetRefreshToken(userId)
+  return userId
+}
 export {
-    createUser,loginUser
+    createUser,loginUser,logoutUser
 }

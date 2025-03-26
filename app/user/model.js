@@ -38,4 +38,11 @@ const createUserModel = async (userData) => {
     return result;
 
   };
-  export { createUserModel,getUserModel,updateRefreshToken };
+  const resetRefreshToken = async (userId) =>{
+    const query = 'UPDATE public.user set refresh_token = $1 where id = $2';
+    const values =[null,userId];
+    const result = await pool.query(query,values);
+    return result;
+
+  };
+  export { createUserModel,getUserModel,updateRefreshToken,resetRefreshToken };
