@@ -9,11 +9,9 @@ const createUser = async(userData) =>{
     // Generate a salt and hash the password
   const saltRounds = 10;
   const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
-
-  // Replace plaintext password with hashed password
+  
   const userWithHashedPassword = { ...userData, password: hashedPassword };
-
-  // Save user to the database
+  
   const userCreate = await createUserModel(userWithHashedPassword);
   const tokenPayload={
     id:userCreate.id,
@@ -30,7 +28,6 @@ const createUser = async(userData) =>{
  
 }
 const loginUser = async(email,password) =>{
-  console.log("Here 0")
   const user = await getUserModel(email)
   if(!user){
     return "Invalid login"

@@ -1,9 +1,6 @@
 import { createUser, loginUser, logoutUser } from './service.js';
 import { userSchema } from './validation.js';
 import express from "express"
-import jwt from 'jsonwebtoken'
-import dotenv from 'dotenv'
-import { updateRefreshToken } from './model.js';
 
 const userRouter = express.Router()
 
@@ -15,9 +12,7 @@ userRouter.post('/register', async (req, res) => {
     // Register the user
     const newUser = await createUser(validatedData);
 
-    // Respond with created user (excluding password for security)
-    const { password, ...userWithoutPassword } = newUser;
-    res.status(201).json({ message: 'User created successfully', user: userWithoutPassword });
+    res.status(201).json({ message: 'User created successfully', newUser });
   } catch (error) {
     if (error.name === 'ZodError') {
       res.status(400).json({ errors: error.errors });
@@ -27,10 +22,7 @@ userRouter.post('/register', async (req, res) => {
     }
   }
 });
-//middle ware global in the app.js to check the access token and request the service, like order, logout.
-//express middle ware documentation
-//any end point will be private except 
-//Bearer
+
 userRouter.post('/login', async (req, res) => {
   const { email, password } = req.body;
 

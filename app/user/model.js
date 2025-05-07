@@ -21,14 +21,12 @@ const createUserModel = async (userData) => {
   
   const getUserModel = async (email) => {
     const query = 'SELECT * FROM public.user WHERE email = $1 limit 1;';
-    console.log("Here00",query)
     const values = [email];
     const result = await pool.query(query, values);
   
     if (result.rows.length === 0) {
       return null; // No user found
     }
-    console.log("Here 00",result)
     return result.rows[0];
   }; 
   const updateRefreshToken = async (userId, refreshToken) =>{
